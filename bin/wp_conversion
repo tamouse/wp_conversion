@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require 'methadone'
+require 'wp_conversion'
+
+class App
+  include Methadone::Main
+  include Methadone::CLILogging
+
+  main do |wp_xml|
+    logger.level=Logger::WARN
+    logger.level=Logger::INFO if options[:verbose]
+    logger.error_level=Logger::DEBUG if options[:debug]
+    debug "options: #{options}"
+    debug "wp_xml:  #{wp_xml}"
+    WpConversion.run(wp_xml, options)
+  end
+
+  description "Convert Wordpress xml export to markdown files suitable for jekyll site"
+
+  # on("--flag VAL","Some flag")
+  # options[flag] will contain VAL
+  
+  # on("--[no-]switch","Some switch")
+  on("--verbose","Make wp_conversion chatty")
+  on("--debug",  "Turn on debug mode")
+
+  arg :wp_xml, "Wordpress xml export file."
+
+  # Make an argument optional
+  # arg :optional_arg, :optional
+
+  version WpConversion::VERSION
+
+  # use_log_level_option
+
+  go!
+end
