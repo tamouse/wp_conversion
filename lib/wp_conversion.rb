@@ -1,4 +1,5 @@
-require "wp_conversion/version"
+file_spec = File.join(File.expand_path('../', __FILE__),'**','*.rb')
+Dir[file_spec].each {|file| require file}
 
 module WpConversion
 
