@@ -17,7 +17,9 @@ module WpConversion
           let(:first_book){books.first}
           it {first_book.should be_a(Hash)}
           %w{id author title genre}.each do |attr|
-            it {first_book.has_key?(attr).should be_true}
+            it "first_book should have #{attr}" do
+              first_book.has_key?(attr).should be_true
+            end
           end
         end
       end
