@@ -29,18 +29,17 @@ module WpConversion
 layout: #{item['post_type']}
 author: #{item['creator']}
 date: #{item['post_date']}
-categories: [#{join_if_array(item['category']).tap{|t| debug "#{__FILE__}:#{__LINE__}: output of join_if_array(item['category']): #{t}"}.downcase}]
+categories: [#{join_if_array(item['category']).downcase}]
 ---
 # #{item['title']}
 
 EOT
     markdown += html_to_markdown(item['encoded'].join)
-    # markdown.tap(&:display)
 
   end
 
   def html_to_markdown(html)
-    (HtmlMassage.markdown(html.gsub(/\n/,"<br />\n")) + "\n\n").tap(&:display)
+    HtmlMassage.markdown(html.gsub(/\n/,"<br />\n")) + "\n\n"
   end
   
   def join_if_array(s)
