@@ -13,5 +13,5 @@ Feature: My bootstrapped app kinda works
       |--debug  |
       |--verbose|
     And the banner should document that this app's arguments are:
-      | WPBackup.xml |
+      | wp_xml |
 
