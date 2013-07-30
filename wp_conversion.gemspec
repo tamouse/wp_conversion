@@ -25,6 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('rake')
   spec.add_dependency('methadone', '~> 1.3.0')
   spec.add_dependency('activesupport')
+  spec.add_dependency('html_massage')
   spec.add_development_dependency('rspec')
   spec.add_development_dependency('guard')
   spec.add_development_dependency('guard-rspec')

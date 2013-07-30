@@ -12,6 +12,7 @@ Feature: My bootstrapped app kinda works
       |--version|
       |--debug  |
       |--verbose|
+      |--yaml   |
     And the banner should document that this app's arguments are:
       | wp_xml |
 

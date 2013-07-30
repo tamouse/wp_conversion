@@ -7,14 +7,37 @@ require 'wp_conversion'
 class App
   include Methadone::Main
   include Methadone::CLILogging
+  include WpConversion
 
   main do |wp_xml|
-    logger.level=Logger::WARN
-    logger.level=Logger::INFO if options[:verbose]
-    logger.error_level=Logger::DEBUG if options[:debug]
-    debug "options: #{options}"
-    debug "wp_xml:  #{wp_xml}"
-    WpConversion.run(wp_xml, options)
+    begin
+
+      logger.level=Logger::WARN
+      logger.level=Logger::INFO if options[:verbose]
+      logger.error_level=Logger::DEBUG if options[:debug]
+      debug "options: #{options}"
+      debug "wp_xml:  #{wp_xml}"
+      
+      info "Reading #{wp_xml}"
+      items = WpConversion.xml_to_hash(File.read(wp_xml))['rss']['channel']['item']
+      info "#{items.size} items to save"
+
+      items.each do |item|
+        info "Saving item #{item['title']} as #{item['post_type']}"
+        if options[:yaml]
+          info "Saving as yaml"
+          WpConversion.save_an_item(item,:yaml)
+        end
+        info "Converting to markdown"
+        WpConversion.save_an_item(item,:markdown)
+      end
+
+    rescue Exception => e
+      error "#{e} (#{e.class})"
+      debug "Backtrace: \n" + e.backtrace.join("\n")
+    end
+    
+    
   end
 
   description "Convert Wordpress xml export to markdown files suitable for jekyll site"
@@ -25,6 +48,7 @@ class App
   # on("--[no-]switch","Some switch")
   on("--verbose","Make wp_conversion chatty")
   on("--debug",  "Turn on debug mode")
+  on("--yaml",   "Save items as yaml files as well")
 
   arg :wp_xml, "Wordpress xml export file."
 
