@@ -1,5 +1,6 @@
 require 'active_support/core_ext/string/inflections.rb'
 require 'fileutils'
+require 'stringex'
 
 module WpConversion
 
@@ -21,7 +22,8 @@ module WpConversion
               item['post_date'].split(" ").first + '-':
               ''
               )
-    File.join(dir_name, "#{prefix}#{item['post_name']}.#{ext}")
+    slug = item['post_name'] ||= item['title'] ||= 'unnamed'
+    File.join(dir_name, "#{prefix}#{slug.to_url.gsub(%r{[^-./[:alnum:]]},'')}.#{ext}")
   end
 
 end

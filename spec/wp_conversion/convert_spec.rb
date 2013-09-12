@@ -48,10 +48,21 @@ module WpConversion
     describe "convert_to_markdown" do
       let(:markdown) {WpConversion.convert_to_markdown(item)}
       it {markdown.should be_a(String)}
-      it {markdown.should match /^---\nlayout: #{item['post_type']}\nauthor: #{item['creator']}\ndate: #{item['post_date']}\ncategories: \[#{item['category'].downcase}\]\n---/}
-      it {markdown.should match /---\n# #{item['title']}\n\n/}
+      it {markdown.should match /^---\nlayout: #{item['post_type']}\ntitle:.*\nauthor: #{item['creator']}\ndate: #{item['post_date']}\ntags: \[#{item['category'].downcase}\]\n---/}
     end
 
   end
+
+  describe "convert php serialized data" do
+    let(:data){"a:6:{s:5:\"width\";s:4:\"2321\";s:6:\"height\";s:4:\"1677\";s:14:\"hwstring_small\";s:23:\"height='92' width='128'\";s:4:\"file\";s:30:\"2012/02/zigzag.riversketch.jpg\";s:5:\"sizes\";a:6:{s:9:\"thumbnail\";a:3:{s:4:\"file\";s:30:\"zigzag.riversketch-150x150.jpg\";s:5:\"width\";s:3:\"150\";s:6:\"height\";s:3:\"150\";}s:6:\"medium\";a:3:{s:4:\"file\";s:30:\"zigzag.riversketch-300x216.jpg\";s:5:\"width\";s:3:\"300\";s:6:\"height\";s:3:\"216\";}s:5:\"large\";a:3:{s:4:\"file\";s:31:\"zigzag.riversketch-1024x739.jpg\";s:5:\"width\";s:4:\"1024\";s:6:\"height\";s:3:\"739\";}s:14:\"post-thumbnail\";a:3:{s:4:\"file\";s:31:\"zigzag.riversketch-1000x288.jpg\";s:5:\"width\";s:4:\"1000\";s:6:\"height\";s:3:\"288\";}s:13:\"large-feature\";a:3:{s:4:\"file\";s:31:\"zigzag.riversketch-1000x288.jpg\";s:5:\"width\";s:4:\"1000\";s:6:\"height\";s:3:\"288\";}s:13:\"small-feature\";a:3:{s:4:\"file\";s:30:\"zigzag.riversketch-415x300.jpg\";s:5:\"width\";s:3:\"415\";s:6:\"height\";s:3:\"300\";}}s:10:\"image_meta\";a:10:{s:8:\"aperture\";s:1:\"0\";s:6:\"credit\";s:0:\"\";s:6:\"camera\";s:0:\"\";s:7:\"caption\";s:0:\"\";s:17:\"created_timestamp\";s:1:\"0\";s:9:\"copyright\";s:0:\"\";s:12:\"focal_length\";s:1:\"0\";s:3:\"iso\";s:1:\"0\";s:13:\"shutter_speed\";s:1:\"0\";s:5:\"title\";s:0:\"\";}}"}
+    let(:un_data){WpConversion.php_unserialize(data)}
+    it "should return unserialized data" do
+      un_data.should be_a Hash
+    end
+
+  end
+
+
+
 
 end
