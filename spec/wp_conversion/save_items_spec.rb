@@ -50,4 +50,12 @@ EOT
 
   end
 
+  describe "slug making" do
+    it {WpConversion.make_slug({'post_name' => "this-is-a-post-name"}).should == "this-is-a-post-name"}
+    it {WpConversion.make_slug({'post_name' => nil, 'title' => 'This is the Post Name'}).should == 'this-is-the-post-name'}
+    it {WpConversion.make_slug({'post_name' => '', 'title' => 'This is the Post Name'}).should == 'this-is-the-post-name'}
+    it {WpConversion.make_slug({'post_name' => nil, 'title' => nil}).should == 'unnamed'}
+    it {WpConversion.make_slug({'post_name' => nil, 'title' => ''}).should == 'unnamed'}
+  end
+
 end

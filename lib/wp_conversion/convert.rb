@@ -20,10 +20,12 @@ module WpConversion
   end
   
   def convert_to_yaml(item)
-    process_indifferently item['postmeta'] do |meta_item|
-      debug "convert_to_yaml: meta_item: #{meta_item.inspect}"
-      if meta_item['meta_value'] =~ /^[:alpha:]:[:digit:]:/
-        meta_item['meta_value'] = php_unserialize(meta_item['meta_value'])
+    if item.has_key? 'postmeta'
+      process_indifferently item['postmeta'] do |meta_item|
+        debug "convert_to_yaml #{__LINE__}: meta_item: #{meta_item.inspect}"
+        if meta_item['meta_value'] =~ /^[:alpha:]:\d:/
+          meta_item['meta_value'] = php_unserialize(meta_item['meta_value']).tap{|t| debug "convert_to_yaml #{__LINE__}: php_unserialize: #{t.inspect}"}
+        end
       end
     end
     item.to_yaml
@@ -31,13 +33,20 @@ module WpConversion
 
   def convert_to_markdown(item)
     return '' unless %w{page post}.include? item['post_type']
+    unless item['title'].nil?
+      title = item['title'].gsub(%r{:},'-') # funny things happen with
+      # colons in yaml entries....
+    else
+      title = 'unnamed'
+    end
+    tags = join_if_array(clean_tags(item['category'])).downcase
     markdown= <<-EOT
 ---
 layout: #{item['post_type']}
-title: #{item['title'].gsub(/:/,'-')}
+title: #{title}
 author: #{item['creator']}
 date: #{item['post_date']}
-tags: [#{join_if_array(item['category']).downcase}]
+tags: [#{tags}]
 ---
 #{html_to_markdown(item['encoded'].join)}
 EOT
@@ -47,8 +56,15 @@ EOT
     HtmlMassage.markdown(html.gsub(/\n/,"<br />\n")) + "\n\n"
   end
   
+  def clean_tags(s)
+    alnum_only = %r{[^[:alnum:]]}    
+    process_indifferently(s) do |tag|
+      tag.gsub!(alnum_only,'')
+    end
+    s.tap{|t| debug "clean_tags #{__LINE__}: return: #{t.inspect}"}
+  end
+
   def join_if_array(s)
-    debug "#{__FILE__}:#{__LINE__}: s: #{s.inspect}"
     if s.kind_of? Array
       s.join(", ")
     else

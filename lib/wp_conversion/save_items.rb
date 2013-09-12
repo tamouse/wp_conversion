@@ -22,8 +22,16 @@ module WpConversion
               item['post_date'].split(" ").first + '-':
               ''
               )
-    slug = item['post_name'] ||= item['title'] ||= 'unnamed'
-    File.join(dir_name, "#{prefix}#{slug.to_url.gsub(%r{[^-./[:alnum:]]},'')}.#{ext}")
+    slug = make_slug(item)
+    File.join(dir_name, "#{prefix}#{slug}.#{ext}")
   end
+
+  def make_slug(item)
+    return item['post_name'] unless item['post_name'].nil? || item['post_name'].empty?
+    return item['title'].to_url unless item['title'].nil? || item['title'].empty?
+    "unnamed"
+  end
+
+
 
 end

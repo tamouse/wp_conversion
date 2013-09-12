@@ -62,7 +62,62 @@ module WpConversion
 
   end
 
+  describe "convert item with php serialized data" do
+    let(:item_with_php_serialize_data){
+      {"title"=>"Last post?",
+        "link"=>"http://www.tamaratemple.com/2013/05/14/last-post/",
+        "pubDate"=>"Wed, 15 May 2013 04:56:21 +0000",
+        "creator"=>"tamouse",
+        "guid"=>"http://tamouse.org/?p=3701",
+        "description"=>nil,
+        "encoded"=>
+        ["This might be the last post from here. I'm having all sorts of troubles with comment spammers, ddos attacks on our VPS, port scans and probes.  It's all become too much, and it bogs down the system so it becomes so frustrating to work with. Doing this, running my own server, blogs, wikis, email and so on has been sorta fun. But I think it's time I moved on from that. This may resurface on tublr or something, if I feel like it.\n\nThis blog (as well as the others I've been running) has never really developed any sort of audience, and certainly not generated any sort of interest, community, or even communication. So it's not really doing much of anything anyway.\n\nIf you are a reader, of any stripe, post a comment, give me some feedback via the contact form, or send me an <a href=\"mailto:tamara@tamaratemple.com\">email</a>. It'd be good to hear from you; let me know what direction if any I should go in.",
+         ""],
+        "post_id"=>"3701",
+        "post_date"=>"2013-05-14 23:56:21",
+        "post_date_gmt"=>"2013-05-15 04:56:21",
+        "comment_status"=>"open",
+        "ping_status"=>"open",
+        "post_name"=>"last-post",
+        "status"=>"publish",
+        "post_parent"=>"0",
+        "menu_order"=>"0",
+        "post_type"=>"post",
+        "post_password"=>nil,
+        "is_sticky"=>"0",
+        "category"=>"Uncategorized",
+        "postmeta"=>
+        [{"meta_key"=>"_edit_last", "meta_value"=>"1"},
+         {"meta_key"=>"_jp_jpics",
+           "meta_value"=>
+           "a:3:{i:1;s:4:\"tree\";i:3;s:15:\"colourful trees\";i:2;s:6:\"mousie\";}"}]}
+    }
+    let(:yamlized_item){WpConversion.convert_to_yaml(item_with_php_serialize_data)}
+    let(:unyamlized_item){YAML.load(yamlized_item)}
+    it {yamlized_item.should be_a String}
+    it {unyamlized_item.should be_a Hash}
+    it {unyamlized_item.should have_key "postmeta"}
+    it {unyamlized_item["postmeta"].should be_an Array}
+    it {unyamlized_item["postmeta"].size.should == 2}
+    it {unyamlized_item["postmeta"].last.should have_key "meta_value"}
+    it {unyamlized_item["postmeta"].last["meta_value"].should be_a Hash}
+    it {unyamlized_item["postmeta"].last["meta_value"]["1"].should eq "tree"}
+    it {unyamlized_item["postmeta"].last["meta_value"]["3"].should eq "colourful trees"}
+    it {unyamlized_item["postmeta"].last["meta_value"]["2"].should eq "mousie"}
+  end
 
+  describe "clean and convert tags" do
+    it {WpConversion.clean_tags('sometag').should eq 'sometag'}
+    it {WpConversion.clean_tags('@sometag').should eq 'sometag'}
+    it {WpConversion.clean_tags('#sometag').should eq 'sometag'}
+    it {WpConversion.clean_tags('some tag').should eq 'sometag'}
+    it {WpConversion.clean_tags(['sometag', 'some other tag', '&another tag']).should eq ['sometag','someothertag','anothertag']}
+  end
+
+  describe "join tags correctly" do
+    it {WpConversion.join_if_array('not an array').should eq 'not an array'}
+    it {WpConversion.join_if_array(%w{is an array}).should eq 'is, an, array'}
+  end
 
 
 end
