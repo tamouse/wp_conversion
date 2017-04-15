@@ -119,5 +119,11 @@ module WpConversion
     it {WpConversion.join_if_array(%w{is an array}).should eq 'is, an, array'}
   end
 
+  describe "process indifferently" do
+    it {WpConversion.process_indifferently(nil){}.should be_nil}
+    it {WpConversion.process_indifferently("one item"){|item| item}.should eq "one item"}
+    it {WpConversion.process_indifferently(%w{two items}){|item| item}.should eq %w{two items}}
+  end
+  
 
 end

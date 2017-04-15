@@ -59,7 +59,7 @@ EOT
   def clean_tags(s)
     alnum_only = %r{[^[:alnum:]]}    
     process_indifferently(s) do |tag|
-      tag.gsub!(alnum_only,'')
+      tag.gsub!(alnum_only,'') unless tag.nil?
     end
     s.tap{|t| debug "clean_tags #{__LINE__}: return: #{t.inspect}"}
   end
@@ -73,6 +73,7 @@ EOT
   end
   
   def process_indifferently(obj)
+    return if obj.nil?
     if obj.kind_of? Array
       obj.each do |item|
         yield item
